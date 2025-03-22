@@ -1,0 +1,36 @@
+<div class="page-container">
+  {% section 'homepage-banner' %}
+  
+  <div class="section-header">
+    <h2>Wholesale</h2>
+    <a href="/collections/wholesale" class="view-all">View All</a>
+  </div>
+  
+  {% section 'featured-collection' with 
+    section_id: 'wholesale-collection',
+    collection_handle: 'wholesale',
+    products_to_show: 4
+  %}
+  
+  <div class="section-header">
+    <h2>Amazon or Walmart</h2>
+    <a href="/collections/amazon-walmart" class="view-all">View All</a>
+  </div>
+  
+  {% section 'featured-collection' with 
+    section_id: 'amazon-walmart-collection',
+    collection_handle: 'amazon-walmart',
+    products_to_show: 4
+  %}
+  
+  <div class="section-header">
+    <h2>New on {{ shop.name }}</h2>
+    <a href="/collections/new" class="view-all">View All</a>
+  </div>
+  
+  {% section 'featured-collection' with 
+    section_id: 'new-collection',
+    collection_handle: 'new',
+    products_to_show: 4
+  %}
+</div>
