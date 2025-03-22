@@ -1,0 +1,139 @@
+<div class="product-container">
+  <div class="product-breadcrumb">
+    <a href="/">Home</a> &gt;
+    <a href="/collections/{{ product.collections.first.handle }}">{{ product.collections.first.title }}</a>
+  </div>
+  
+  <div class="product-main">
+    <div class="product-gallery">
+      <div class="main-image">
+        <img src="{{ product.featured_image | img_url: 'large' }}" alt="{{ product.title }}" id="featured-image">
+      </div>
+      
+      {% if product.images.size > 1 %}
+        <div class="thumbnail-list">
+          {% for image in product.images %}
+            <div class="thumbnail" data-image-id="{{ image.id }}">
+              <img src="{{ image | img_url: 'small' }}" alt="{{ image.alt | default: product.title }}">
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    
+    <div class="product-details">
+      <h1 class="product-title">{{ product.title }}</h1>
+      <div class="product-vendor">{{ product.vendor }}</div>
+      
+      <div class="product-description">
+        {{ product.description }}
+      </div>
+      
+      <div class="product-meta">
+        <div class="meta-item">
+          <div class="meta-label">Units in listing:</div>
+          <div class="meta-value">{{ product.variants | sum: 'inventory_quantity' }} units</div>
+        </div>
+        
+        <div class="meta-item">
+          <div class="meta-label">Avg price/unit:</div>
+          <div class="meta-value">${{ product.price | money_without_currency | times: 1.0 | divided_by: product.variants.first.inventory_quantity | round: 2 }}</div>
+        </div>
+        
+        <div class="meta-item">
+          <div class="meta-label">Min. Order Value:</div>
+          <div class="meta-value">{{ product.metafields.custom.min_order_value }}</div>
+        </div>
+        
+        {% if product.metafields.custom.location %}
+          <div class="meta-item">
+            <div class="meta-label">Location:</div>
+            <div class="meta-value">{{ product.metafields.custom.location }}</div>
+          </div>
+        {% endif %}
+      </div>
+      
+      <form action="/cart/add" method="post" enctype="multipart/form-data" id="add-to-cart-form">
+        <div class="product-variants">
+          {% if product.has_only_default_variant %}
+            <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+          {% else %}
+            <div class="variant-selectors">
+              {% for option in product.options_with_values %}
+                <div class="variant-option">
+                  <label for="Option{{ option.position }}">{{ option.name }}</label>
+                  <select 
+                    id="Option{{ option.position }}" 
+                    name="options[{{ option.name }}]" 
+                    class="variant-select"
+                  >
+                    {% for value in option.values %}
+                      <option 
+                        value="{{ value }}" 
+                        {% if option.selected_value == value %}selected="selected"{% endif %}
+                      >
+                        {{ value }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="action-buttons">
+          <button type="submit" class="primary-button">Take All</button>
+          <button type="button" class="secondary-button js-line-sheet">Line Sheet</button>
+          <button type="button" class="secondary-button js-save-favorites">
+            <svg width="16" height="16" viewBox="0 0 16 16">
+              <path d="M8 14.8l-1.1-1c-4-3.7-6.9-6.5-6.9-9.6 0-2.6 2-4.6 4.6-4.6 1.4 0 2.8 0.7 3.7 1.8 0.9-1.1 2.3-1.8 3.7-1.8 2.6 0 4.6 2 4.6 4.6 0 3.1-2.9 5.9-6.9 9.6l-1.1 1z"></path>
+            </svg>
+            Save to Favorites
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div class="product-inventory">
+    <h2 class="section-title">Inventory</h2>
+    
+    <div class="inventory-table">
+      <div class="table-header">
+        <div class="header-cell">Product Name</div>
+        <div class="header-cell">Variants</div>
+        <div class="header-cell">MSRP</div>
+        <div class="header-cell">Price/Unit</div>
+        <div class="header-cell">Total Units</div>
+        <div class="header-cell">Total Price</div>
+        <div class="header-cell"></div>
+      </div>
+      
+      <div class="table-body">
+        {% for variant in product.variants %}
+          <div class="table-row">
+            <div class="cell product-cell">
+              <div class="cell-image">
+                <img src="{{ variant.featured_image | default: product.featured_image | img_url: 'small' }}" alt="{{ variant.title }}">
+              </div>
+              <div class="cell-name">{{ variant.title }}</div>
+            </div>
+            <div class="cell">{{ variant.option1 }}{% if variant.option2 %}, {{ variant.option2 }}{% endif %}{% if variant.option3 %}, {{ variant.option3 }}{% endif %}</div>
+            <div class="cell">${{ variant.compare_at_price | money_without_currency }}</div>
+            <div class="cell">${{ variant.price | money_without_currency }}</div>
+            <div class="cell">{{ variant.inventory_quantity }}</div>
+            <div class="cell">${{ variant.price | times: variant.inventory_quantity | money_without_currency }}</div>
+            <div class="cell">
+              <button class="add-button" data-variant-id="{{ variant.id }}">
+                <svg width="16" height="16" viewBox="0 0 16 16">
+                  <path d="M8 0c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zM12 9h-3v3h-2v-3h-3v-2h3v-3h2v3h3v2z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
